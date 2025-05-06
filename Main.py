@@ -26,7 +26,7 @@ data = {
     'location' : 1 ,
     'data_value' : 1 ,
     'description_long' : 1 ,
-    'image_path' : "Img Source/Img_Termica.jpg"
+    'image_path' : "Img_Source/Img_Termica.jpg"
     }
 
-create_report_pdf(data, )
+create_report_pdf(data, "Result/")
