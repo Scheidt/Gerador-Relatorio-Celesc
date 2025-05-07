@@ -1,32 +1,40 @@
 from Report_Creator import *
 
-data = {
-    'report_code' : 1 ,
-    'report_date' : 1 ,
-    'reg_code' : 1 ,
-    'pbo_code' : 1 ,
-    'classification' : 1 ,
-    'info_title' : 1 ,
-    'inspector' : 1 ,
-    'delta_t' : 1 ,
-    'temp_ambient' : 1 ,
-    'temp_object' : 1 ,
-    'agency_region' : 1 ,
-    'feeder' : 1 ,
-    'equipment' : 1 ,
-    'form_number' : 1 ,
-    'department_info' : 1 ,
-    'dec_atual' : 1 ,
-    'contrib_dec' : 1 ,
-    'uc_conjunto' : 1 ,
-    'uc_possiveis' : 1 ,
-    'dec_date' : 1 ,
-    'contrib_global' : 1 ,
-    'situacao_dec' : 1 ,
-    'location' : 1 ,
-    'data_value' : 1 ,
-    'description_long' : 1 ,
-    'image_path' : "Img_Source/Img_Termica.jpg"
-    }
+sample_data = {
+    'report_code':       "PBO-02-19 B",
+    'report_date':       "02/19",
+    'reg_code':          "REG-302",
+    'pbo_code':          "PBO-02",
+    'classification':    "CLASSIFICAÇÃO DA MANUTENÇÃO PROGRAMADA",
+    'info_title':        "INFORMAÇÕES SOBRE CONTINUIDADE",
+    'inspector':         "RODRIGO",
+    'delta_t':           "32,8",
+    'temp_ambient':      "30",
+    'temp_object':       "62,8",
+    'agency_region':     "AGÊNCIA REGIONAL DE ITAJAÍ",
+    'feeder':            "",
+    'equipment':         "",
+    'form_number':       "NOTA Nº 810000068071",
+    'department_info':   (
+        "DIRETORIA DE DISTRIBUIÇÃO DEPARTAMENTO DE MANUTENÇÃO DO SISTEMA "
+        "ELÉTRICO DIVISÃO DE MANUTENÇÃO DA DISTRIBUIÇÃO"
+    ),
+    'dec_atual':         "5.311",
+    'contrib_dec':       "66.164",
+    'uc_conjunto':       "9,00",
+    'uc_possiveis':      "0,73",
+    'dec_date':          "28/01/19",
+    'contrib_global':    "0,007",
+    'situacao_dec':      "BOM",
+    'location':          "ITAPEMA, MORRETES, BR 101",
+    'data_value':        "0,290",
+    'description_long':  (
+        "TERMINAL SUPERIOR DA BY PASS LADO FONTE DA FASE DE DENTRO, "
+        "TERMINAL INFERIOR DA BY PASS LADO FONTE DA FASE DE FORA, "
+        "CONTATO SUPERIOR DA BY PASS LADO CARGA DA FASE DE FORA, "
+        "TERMINAL E CONTATO SUPERIOR DA BY PASS LADO FONTE DA FASE DO MEIO"
+    ),
+    'image_path':        "Img_Source/Img_Termica.jpg"
+}
 
-create_report_pdf(data, "Result/")
+create_report_pdf(sample_data, "relatorio_exemplo.pdf")

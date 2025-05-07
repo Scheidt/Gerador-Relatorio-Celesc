@@ -1,22 +1,40 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Table, TableStyle,
-    Image, Spacer
-)
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Image, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import mm
 
-def create_report_pdf(data: dict, output_path: str):
-    # Chaves esperadas em `data`:
-    # 'report_code', 'report_date', 'reg_code', 'pbo_code',
-    # 'classification', 'info_title', 'inspector', 'delta_t',
-    # 'temp_ambient', 'temp_object', 'agency_region', 'feeder',
-    # 'equipment', 'form_number', 'department_info', 'dec_atual',
-    # 'contrib_dec', 'uc_conjunto', 'uc_possiveis', 'dec_date',
-    # 'contrib_global', 'situacao_dec', 'location', 'data_value',
-    # 'description_long', 'image_path'
-
+def create_report_pdf(data, output_path):
+    """
+    data deve conter as seguintes chaves (todas strings):
+      report_code        # ex: "PBO-02-19 B"
+      report_date        # ex: "02/19"
+      reg_code           # ex: "REG-302"
+      pbo_code           # ex: "PBO-02"
+      classification     # ex: "CLASSIFICAÇÃO DA MANUTENÇÃO PROGRAMADA"
+      info_title         # ex: "INFORMAÇÕES SOBRE CONTINUIDADE"
+      inspector          # ex: "RODRIGO"
+      delta_t            # ex: "32,8"
+      temp_ambient       # ex: "30"
+      temp_object        # ex: "62,8"
+      agency_region      # ex: "AGÊNCIA REGIONAL DE ITAJAÍ"
+      feeder             # ex: ""  (em branco no exemplo)
+      equipment          # ex: ""  (em branco no exemplo)
+      form_number        # ex: "NOTA Nº 810000068071"
+      department_info    # ex: "DIRETORIA DE DISTRIBUIÇÃO DEPARTAMENTO DE MANUTENÇÃO DO SISTEMA ELÉTRICO DIVISÃO DE MANUTENÇÃO DA DISTRIBUIÇÃO"
+      dec_atual          # ex: "5.311"
+      contrib_dec        # ex: "66.164"
+      uc_conjunto        # ex: "9,00"
+      uc_possiveis       # ex: "0,73"
+      dec_date           # ex: "28/01/19"
+      contrib_global     # ex: "0,007"
+      situacao_dec       # ex: "BOM"
+      location           # ex: "ITAPEMA, MORRETES, BR 101"
+      data_value         # ex: "0,290"
+      description_long   # texto longo da descrição de componentes
+      image_path         # caminho para o arquivo de imagem
+    """
+    # configura documento
     doc = SimpleDocTemplate(
         output_path,
         pagesize=A4,
@@ -26,100 +44,102 @@ def create_report_pdf(data: dict, output_path: str):
     styles = getSampleStyleSheet()
     story = []
 
-    # Cabeçalho com códigos
-    header_data = [[
-        data['report_code'], data['report_date'],
-        data['reg_code'], data['pbo_code']
-    ]]
-    tbl = Table(header_data, colWidths=[50*mm, 30*mm, 50*mm, 30*mm])
-    tbl.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE',  (0,0), (-1,-1), 12),
-        ('ALIGN',    (0,0), (-1,-1), 'CENTER'),
+    # cabeçalho com códigos
+    header = Table(
+        [[
+            data['report_code'], data['report_date'],
+            data['reg_code'],    data['pbo_code']
+        ]],
+        colWidths=[50*mm, 30*mm, 50*mm, 30*mm]
+    )
+    header.setStyle(TableStyle([
+        ('FONTNAME',      (0,0), (-1,-1), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0), (-1,-1), 12),
+        ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
         ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
-    story.append(tbl)
-    story.append(Spacer(1, 6))
+    story.extend([header, Spacer(1,6)])
 
-    # Título da classificação
-    story.append(Paragraph(data['classification'], styles['Heading2']))
-    story.append(Spacer(1, 4))
+    # título de classificação
+    story.extend([
+        Paragraph(data['classification'], styles['Heading2']),
+        Spacer(1,4),
+    ])
 
-    # Seção de informações sobre continuidade
-    story.append(Paragraph(data['info_title'], styles['Heading3']))
-    story.append(Spacer(1, 6))
-
-    info_data = [
-        ['Inspetor:', data['inspector']],
-        ['ΔT (°C):', data['delta_t']],
-        ['Temperatura Ambiente (°C):', data['temp_ambient']],
+    # seção de informações
+    story.extend([
+        Paragraph(data['info_title'], styles['Heading3']),
+        Spacer(1,6)
+    ])
+    info_tbl = Table([
+        ['Inspetor:',                   data['inspector']],
+        ['ΔT (°C):',                    data['delta_t']],
+        ['Temperatura Ambiente (°C):',  data['temp_ambient']],
         ['Temperatura do Objeto (°C):', data['temp_object']],
-    ]
-    info_tbl = Table(info_data, colWidths=[60*mm, 80*mm])
+    ], colWidths=[60*mm, 80*mm])
     info_tbl.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-        ('FONTSIZE',  (0,0), (-1,-1), 10),
-        ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
-        ('BOX',       (0,0), (-1,-1), 0.5, colors.black),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ('FONTNAME',    (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE',    (0,0), (-1,-1), 10),
+        ('BACKGROUND',  (0,0), (-1,0),   colors.lightgrey),
+        ('BOX',         (0,0), (-1,-1), 0.5, colors.black),
+        ('INNERGRID',   (0,0), (-1,-1), 0.5, colors.grey),
     ]))
-    story.append(info_tbl)
-    story.append(Spacer(1, 8))
+    story.extend([info_tbl, Spacer(1,8)])
 
-    # Agência regional e imagem
-    story.append(Paragraph(data['agency_region'], styles['Normal']))
-    story.append(Spacer(1, 4))
+    # agência regional e imagem
+    story.extend([
+        Paragraph(data['agency_region'], styles['Normal']),
+        Spacer(1,4),
+        Image(data['image_path'], width=80*mm, height=50*mm),
+        Spacer(1,10),
+    ])
 
-    img = Image(data['image_path'], width=80*mm, height=50*mm)
-    story.append(img)
-    story.append(Spacer(1, 10))
-
-    # Alimentador, equipamento e formulário
-    meta_data = [
+    # alimentador, equipamento e formulário
+    meta_tbl = Table([
         ['Alimentador:', data['feeder']],
         ['Equipamento:', data['equipment']],
-        ['Formulário:', data['form_number']],
-    ]
-    meta_tbl = Table(meta_data, colWidths=[50*mm, 90*mm])
+        ['Formulário:',  data['form_number']],
+    ], colWidths=[50*mm, 90*mm])
     meta_tbl.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTNAME',  (0,0), (-1,-1), 'Helvetica'),
         ('FONTSIZE',  (0,0), (-1,-1), 10),
-        ('INNERGRID', (0,0), (-1,-1), 0.3, colors.grey),
+        ('INNERGRID',(0,0), (-1,-1), 0.3, colors.grey),
     ]))
-    story.append(meta_tbl)
-    story.append(Spacer(1, 8))
+    story.extend([meta_tbl, Spacer(1,8)])
 
-    # Departamento / informações longas
-    story.append(Paragraph(data['department_info'], styles['Normal']))
-    story.append(Spacer(1, 8))
+    # departamento / diretoria
+    story.extend([
+        Paragraph(data['department_info'], styles['Normal']),
+        Spacer(1,8),
+    ])
 
-    # Dados de DEC
-    dec_data = [
-        ['DEC Atual do Conjunto (hs):', data['dec_atual']],
-        ['Contribuição p/ DEC do Conjunto:', data['contrib_dec']],
-        ['UC do Conjunto:', data['uc_conjunto']],
-        ['UC Possíveis Afetadas:', data['uc_possiveis']],
-        ['Data:', data['dec_date']],
-        ['Contribuição Global:', data['contrib_global']],
-        ['Situação do DEC do Conjunto:', data['situacao_dec']],
-    ]
-    dec_tbl = Table(dec_data, colWidths=[70*mm, 70*mm])
+    # dados de DEC
+    dec_tbl = Table([
+        ['DEC Atual do Conjunto (hs):',          data['dec_atual']],
+        ['Contribuição p/ DEC do Conjunto:',    data['contrib_dec']],
+        ['UC do Conjunto:',                     data['uc_conjunto']],
+        ['UC Possíveis Afetadas:',              data['uc_possiveis']],
+        ['Data:',                               data['dec_date']],
+        ['Contribuição Global:',                data['contrib_global']],
+        ['Situação do DEC do Conjunto:',        data['situacao_dec']],
+    ], colWidths=[70*mm, 70*mm])
     dec_tbl.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-        ('FONTSIZE',  (0,0), (-1,-1), 10),
-        ('BOX',       (0,0), (-1,-1), 0.3, colors.black),
-        ('INNERGRID', (0,0), (-1,-1), 0.3, colors.grey),
+        ('FONTNAME',    (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE',    (0,0), (-1,-1), 10),
+        ('BOX',         (0,0), (-1,-1), 0.3, colors.black),
+        ('INNERGRID',   (0,0), (-1,-1), 0.3, colors.grey),
     ]))
-    story.append(dec_tbl)
-    story.append(Spacer(1, 10))
+    story.extend([dec_tbl, Spacer(1,10)])
 
-    # Localização, data e descrição longa
-    story.append(Paragraph(f"<b>Localização:</b> {data['location']}", styles['Normal']))
-    story.append(Spacer(1, 4))
-    story.append(Paragraph(f"<b>Data:</b> {data['data_value']}", styles['Normal']))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(data['description_long'], styles['Normal']))
-    story.append(Spacer(1, 10))
+    # localização, data e descrição longa
+    story.extend([
+        Paragraph(f"<b>Localização:</b> {data['location']}", styles['Normal']),
+        Spacer(1,4),
+        Paragraph(f"<b>Data:</b> {data['data_value']}", styles['Normal']),
+        Spacer(1,6),
+        Paragraph(data['description_long'], styles['Normal']),
+        Spacer(1,10),
+    ])
 
-    # Gera o PDF
+    # gera o PDF
     doc.build(story)
