@@ -32,7 +32,8 @@ def create_report_pdf(data, output_path):
       location           # ex: "ITAPEMA, MORRETES, BR 101"
       data_value         # ex: "0,290"
       description_long   # texto longo da descrição de componentes
-      image_path         # caminho para o arquivo de imagem
+      visual_image_path  # caminho para o arquivo de imagem visual
+      thermal_image_path # caminho para o arquivo de imagem térmica
     """
     # configura documento
     doc = SimpleDocTemplate(
@@ -88,10 +89,16 @@ def create_report_pdf(data, output_path):
 
     # agência regional e imagem
     story.extend([
-        Paragraph(data['agency_region'], styles['Normal']),
-        Spacer(1,4),
-        Image(data['image_path'], width=80*mm, height=50*mm),
-        Spacer(1,10),
+    Paragraph(data['agency_region'], styles['Normal']),
+    Spacer(1,4),
+    Table(
+        [[
+            Image(data['visual_image_path'], width=80*mm, height=50*mm),
+            Image(data['thermal_image_path'], width=80*mm, height=50*mm),
+        ]],
+        colWidths=[80*mm, 80*mm]
+    ),
+    Spacer(1,10),
     ])
 
     # alimentador, equipamento e formulário

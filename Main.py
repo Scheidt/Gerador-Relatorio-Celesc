@@ -34,7 +34,8 @@ sample_data = {
         "CONTATO SUPERIOR DA BY PASS LADO CARGA DA FASE DE FORA, "
         "TERMINAL E CONTATO SUPERIOR DA BY PASS LADO FONTE DA FASE DO MEIO"
     ),
-    'image_path':        "Img_Source/Img_Termica.jpg"
+    'visual_image_path':        "Img_Source/Img_Visual.jpg",
+    'thermal_image_path':       "Img_Source/Img_Termica"
 }
 
 create_report_pdf(sample_data, "relatorio_exemplo.pdf")
