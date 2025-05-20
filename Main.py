@@ -1,7 +1,8 @@
 from report_Creator import *
 
 sample_data = {
-    # Logo da CELESC
+    # Logo da CELESC (imagem)
+    'logo_path': "Img_Source/logoCelesc.png",
     # Data e Hora
     'report_code':       "PBO-02-19 B",
     'report_date':       "02/19",
@@ -14,9 +15,10 @@ sample_data = {
     'temp_ambient':      "30",
     'temp_object':       "62,8",
     'agency_region':     "AGÊNCIA REGIONAL DE ITAJAÍ",
-    'feeder':            "", # Botar legenda
-    'equipment':         "", # Botar legenda
+    'feeder':            "ALIMENTADOR", # Botar legenda
+    'equipment':         "EQUIPAMENTO", # Botar legenda
     'form_number':       "NOTA Nº 810000068071",
+    'emulsivity': "EMULSIVIDADE",
     # Emulsividade
     'department_info':   (
         "DIRETORIA DE DISTRIBUIÇÃO DEPARTAMENTO DE MANUTENÇÃO DO SISTEMA "
