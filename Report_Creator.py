@@ -3,6 +3,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import mm
+from reportlab.lib.styles import ParagraphStyle
+
+from datetime import datetime
 
 def create_report_pdf(data, output_path):
     """
@@ -32,8 +35,11 @@ def create_report_pdf(data, output_path):
       location           # ex: "ITAPEMA, MORRETES, BR 101"
       data_value         # ex: "0,290"
       description_long   # texto longo da descrição de componentes
-      image_path         # caminho para o arquivo de imagem
+      visual_image_path  # caminho para o arquivo de imagem visual
+      thermal_image_path # caminho para o arquivo de imagem térmica
     """
+    #Paragraph(str(), blue_style)
+
     # configura documento
     doc = SimpleDocTemplate(
         output_path,
@@ -43,28 +49,36 @@ def create_report_pdf(data, output_path):
     )
     styles = getSampleStyleSheet()
     story = []
+    robot_gettable = ParagraphStyle(name='BlueText', parent=styles['Normal'], textColor=colors.blue)
 
-    # cabeçalho com códigos
-    header = Table(
-        [[
-            data['report_code'], data['report_date'],
-            data['reg_code'],    data['pbo_code']
-        ]],
-        colWidths=[50*mm, 30*mm, 50*mm, 30*mm]
-    )
-    header.setStyle(TableStyle([
-        ('FONTNAME',      (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE',      (0,0), (-1,-1), 12),
-        ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    # Header with Logo and Codes (Fixed Layout)
+    logo = Image(data['logo_path'])
+    logo.drawHeight = 25 * mm
+    logo.drawWidth = 25 * mm * (648 / 354)  # ≈ 45.75 mm
+
+    # Right column: report metadata
+    header_info = [
+        [Paragraph(f"<b>Código do Relatório:</b> {data['report_code']}", styles['Normal'])],
+        [Paragraph(f"<b>Data:</b> {data['report_date']}", styles['Normal'])],
+        [Paragraph(f"<b>Código REG:</b> {data['reg_code']}", styles['Normal'])],
+        [Paragraph(f"<b>Código PBO:</b> {data['pbo_code']}", styles['Normal'])],
+    ]
+    right_col = Table(header_info, colWidths=[100*mm])
+    right_col.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 10),
+        ('LEFTPADDING', (0,0), (-1,-1), 12),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
-    story.extend([header, Spacer(1,6)])
 
-    # título de classificação
-    story.extend([
-        Paragraph(data['classification'], styles['Heading2']),
-        Spacer(1,4),
-    ])
+    # Main table: logo and metadata
+    header = Table([[logo, right_col]], colWidths=[50*mm, 130*mm])  # Adjust to match scaled logo
+    header.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+    ]))
+
+    story.extend([header, Spacer(1, 12)])
+
 
     # seção de informações
     story.extend([
@@ -88,10 +102,16 @@ def create_report_pdf(data, output_path):
 
     # agência regional e imagem
     story.extend([
-        Paragraph(data['agency_region'], styles['Normal']),
-        Spacer(1,4),
-        Image(data['image_path'], width=80*mm, height=50*mm),
-        Spacer(1,10),
+    Paragraph(data['agency_region'], styles['Normal']),
+    Spacer(1,4),
+    Table(
+        [[
+            Image(data['visual_image_path'], width=80*mm, height=50*mm),
+            Image(data['thermal_image_path'], width=80*mm, height=50*mm),
+        ]],
+        colWidths=[80*mm, 80*mm]
+    ),
+    Spacer(1,10),
     ])
 
     # alimentador, equipamento e formulário
@@ -99,6 +119,8 @@ def create_report_pdf(data, output_path):
         ['Alimentador:', data['feeder']],
         ['Equipamento:', data['equipment']],
         ['Formulário:',  data['form_number']],
+        ['Emulsividade:', data['emulsivity']],
+        ['Horario:', datetime.now().replace(microsecond=0)]
     ], colWidths=[50*mm, 90*mm])
     meta_tbl.setStyle(TableStyle([
         ('FONTNAME',  (0,0), (-1,-1), 'Helvetica'),

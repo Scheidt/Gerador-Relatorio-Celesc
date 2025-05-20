@@ -1,6 +1,9 @@
-from Report_Creator import *
+from report_Creator import *
 
 sample_data = {
+    # Logo da CELESC (imagem)
+    'logo_path': "Img_Source/logoCelesc.png",
+    # Data e Hora
     'report_code':       "PBO-02-19 B",
     'report_date':       "02/19",
     'reg_code':          "REG-302",
@@ -12,9 +15,11 @@ sample_data = {
     'temp_ambient':      "30",
     'temp_object':       "62,8",
     'agency_region':     "AGÊNCIA REGIONAL DE ITAJAÍ",
-    'feeder':            "",
-    'equipment':         "",
+    'feeder':            "ALIMENTADOR", # Botar legenda
+    'equipment':         "EQUIPAMENTO", # Botar legenda
     'form_number':       "NOTA Nº 810000068071",
+    'emulsivity': "EMULSIVIDADE",
+    # Emulsividade
     'department_info':   (
         "DIRETORIA DE DISTRIBUIÇÃO DEPARTAMENTO DE MANUTENÇÃO DO SISTEMA "
         "ELÉTRICO DIVISÃO DE MANUTENÇÃO DA DISTRIBUIÇÃO"
@@ -34,7 +39,8 @@ sample_data = {
         "CONTATO SUPERIOR DA BY PASS LADO CARGA DA FASE DE FORA, "
         "TERMINAL E CONTATO SUPERIOR DA BY PASS LADO FONTE DA FASE DO MEIO"
     ),
-    'image_path':        "Img_Source/Img_Termica.jpg"
+    'visual_image_path':        "Img_Source/Img_Visual.jpg",
+    'thermal_image_path':       "Img_Source/Img_Termica.jpg"
 }
 
 create_report_pdf(sample_data, "relatorio_exemplo.pdf")
