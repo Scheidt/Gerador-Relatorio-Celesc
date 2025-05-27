@@ -5,7 +5,6 @@ from reportlab.lib import colors
 from reportlab.lib.units import mm
 from reportlab.lib.styles import ParagraphStyle
 
-from datetime import datetime
 
 def create_report_pdf(data, output_path):
     """
@@ -121,7 +120,7 @@ def create_report_pdf(data, output_path):
         ['Equipamento:', data['equipment']],
         ['Formulário:',  data['form_number']],
         ['Emissividade:', data['emissivity']],
-        ['Horario:', datetime.now().replace(microsecond=0)]
+        ['Horario:', data['timestamp'].replace(microsecond=0)]
     ], colWidths=[50*mm, 90*mm])
     meta_tbl.setStyle(TableStyle([
         ('FONTNAME',  (0,0), (-1,-1), 'Helvetica'),

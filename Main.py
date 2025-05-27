@@ -1,49 +1,137 @@
 from report_Creator import *
+from datetime import datetime
 
-sample_data = {
-    # Logo da CELESC (imagem)
-    'logo_path': "Img_Source/logoCelesc.png",
-    'report_code':       "PBO-02-19 B",
-    'report_date':       "02/19",
-    'reg_code':          "REG-302",
-    'pbo_code':          "PBO-02",
-    'classification':    "CLASSIFICAÇÃO DA MANUTENÇÃO PROGRAMADA",
-    'info_title':        "INFORMAÇÕES SOBRE CONTINUIDADE",
-    'inspector':         "RODRIGO",
-    'delta_t':           "32,8",
-    'temp_ambient':      "30",
-    'temp_object':       "62,8",
-    'agency_region':     "AGÊNCIA REGIONAL DE ITAJAÍ",
-    'feeder':            "ALIMENTADOR",
-    'equipment':         "EQUIPAMENTO",
-    'form_number':       "NOTA Nº 810000068071",
-    'emissivity': "EMISSIVIDADE",
-    'department_info':   (
+def get_logo_path():
+    return "Img_Source/logoCelesc.png"
+
+def get_report_code():
+    return "PBO-02-19 B"
+
+def get_report_date():
+    return "02/19"
+
+def get_reg_code():
+    return "REG-302"
+
+def get_pbo_code():
+    return "PBO-02"
+
+def get_classification():
+    return "CLASSIFICAÇÃO DA MANUTENÇÃO PROGRAMADA"
+
+def get_info_title():
+    return "INFORMAÇÕES SOBRE CONTINUIDADE"
+
+def get_inspector():
+    return "RODRIGO"
+
+def get_delta_t():
+    return "32,8"
+
+def get_temp_ambient():
+    return "30"
+
+def get_temp_object():
+    return "62,8"
+
+def get_agency_region():
+    return "AGÊNCIA REGIONAL DE ITAJAÍ"
+
+def get_feeder():
+    return "ALIMENTADOR"
+
+def get_equipment():
+    return "EQUIPAMENTO"
+
+def get_form_number():
+    return "NOTA Nº 810000068071"
+
+def get_emissivity():
+    return "EMISSIVIDADE"
+
+def get_department_info():
+    return (
         "DIRETORIA DE DISTRIBUIÇÃO DEPARTAMENTO DE MANUTENÇÃO DO SISTEMA "
         "ELÉTRICO DIVISÃO DE MANUTENÇÃO DA DISTRIBUIÇÃO"
-    ),
-    'dec_atual':         "5.311",
-    'contrib_dec':       "66.164",
-    'uc_conjunto':       "9,00",
-    'uc_possiveis':      "0,73",
-    'dec_date':          "28/01/19",
-    'contrib_global':    "0,007",
-    'situacao_dec':      "BOM",
-    'location':          "ITAPEMA, MORRETES, BR 101",
-    'data_value':        "0,290",
-    'description_long':  (
+    )
+
+def get_dec_atual():
+    return "5.311"
+
+def get_contrib_dec():
+    return "66.164"
+
+def get_uc_conjunto():
+    return "9,00"
+
+def get_uc_possiveis():
+    return "0,73"
+
+def get_dec_date():
+    return "28/01/19"
+
+def get_contrib_global():
+    return "0,007"
+
+def get_situacao_dec():
+    return "BOM"
+
+def get_location():
+    return "ITAPEMA, MORRETES, BR 101"
+
+def get_data_value():
+    return "0,290"
+
+def get_description_long():
+    return (
         "TERMINAL SUPERIOR DA BY PASS LADO FONTE DA FASE DE DENTRO, "
         "TERMINAL INFERIOR DA BY PASS LADO FONTE DA FASE DE FORA, "
         "CONTATO SUPERIOR DA BY PASS LADO CARGA DA FASE DE FORA, "
         "TERMINAL E CONTATO SUPERIOR DA BY PASS LADO FONTE DA FASE DO MEIO"
-    ),
-    'visual_image_path':        "Img_Source/Img_Visual.jpg",
-    'thermal_image_path':       "Img_Source/Img_Termica.jpg"
+    )
+
+def get_visual_image_path():
+    return "Img_Source/Img_Visual.jpg"
+
+def get_thermal_image_path():
+    return "Img_Source/Img_Termica.jpg"
+
+def get_timestamp():
+    return datetime.now()
+
+# Populate the dictionary by calling the getter functions
+sample_data = {
+    'logo_path': get_logo_path(),
+    'report_code': get_report_code(),
+    'report_date': get_report_date(),
+    'reg_code': get_reg_code(),
+    'pbo_code': get_pbo_code(),
+    'classification': get_classification(),
+    'info_title': get_info_title(),
+    'inspector': get_inspector(),
+    'delta_t': get_delta_t(),
+    'temp_ambient': get_temp_ambient(),
+    'temp_object': get_temp_object(),
+    'agency_region': get_agency_region(),
+    'feeder': get_feeder(),
+    'equipment': get_equipment(),
+    'form_number': get_form_number(),
+    'emissivity': get_emissivity(),
+    'department_info': get_department_info(),
+    'dec_atual': get_dec_atual(),
+    'contrib_dec': get_contrib_dec(),
+    'uc_conjunto': get_uc_conjunto(),
+    'uc_possiveis': get_uc_possiveis(),
+    'dec_date': get_dec_date(),
+    'contrib_global': get_contrib_global(),
+    'situacao_dec': get_situacao_dec(),
+    'location': get_location(),
+    'data_value': get_data_value(),
+    'description_long': get_description_long(),
+    'visual_image_path': get_visual_image_path(),
+    'thermal_image_path': get_thermal_image_path()
 }
 
-if float(sample_data["delta_t"]) > 40:
-    sample_data["operation"] = "Manutenção"
-else:
-    sample_data["operation"] = "Ignore"
+
 
 create_report_pdf(sample_data, "relatorio_exemplo.pdf")
