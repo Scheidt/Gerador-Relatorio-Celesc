@@ -8,7 +8,7 @@ def get_report_code():
     return "PBO-02-19 B"
 
 def get_report_date():
-    return "02/19"
+    return datetime.now().strftime("%d/%m")
 
 def get_reg_code():
     return "REG-302"
@@ -33,6 +33,9 @@ def get_temp_ambient():
 
 def get_temp_object():
     return "62,8"
+
+def get_operation():
+    return "RECOMENDAÇÃO"
 
 def get_agency_region():
     return "AGÊNCIA REGIONAL DE ITAJAÍ"
@@ -109,9 +112,10 @@ sample_data = {
     'classification': get_classification(),
     'info_title': get_info_title(),
     'inspector': get_inspector(),
-    'delta_t': get_delta_t(),
     'temp_ambient': get_temp_ambient(),
     'temp_object': get_temp_object(),
+    'delta_t': get_delta_t(),
+    'operation': get_operation(),
     'agency_region': get_agency_region(),
     'feeder': get_feeder(),
     'equipment': get_equipment(),
@@ -127,6 +131,7 @@ sample_data = {
     'situacao_dec': get_situacao_dec(),
     'location': get_location(),
     'data_value': get_data_value(),
+    'timestamp': get_timestamp(),
     'description_long': get_description_long(),
     'visual_image_path': get_visual_image_path(),
     'thermal_image_path': get_thermal_image_path()
