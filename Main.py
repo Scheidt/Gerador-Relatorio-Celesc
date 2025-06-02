@@ -102,6 +102,9 @@ def get_thermal_image_path():
 def get_timestamp():
     return datetime.now()
 
+def get_temp_max_equipment_value():
+    return "Isolador" # Or fetch from actual source
+
 # Populate the dictionary by calling the getter functions
 sample_data = {
     'logo_path': get_logo_path(),
@@ -134,7 +137,8 @@ sample_data = {
     'timestamp': get_timestamp(),
     'description_long': get_description_long(),
     'visual_image_path': get_visual_image_path(),
-    'thermal_image_path': get_thermal_image_path()
+    'thermal_image_path': get_thermal_image_path(),
+    'temp_max_equipment_value': get_temp_max_equipment_value(),
 }
 
 
