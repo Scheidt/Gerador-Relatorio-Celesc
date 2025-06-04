@@ -145,7 +145,7 @@ sample_data = {
     'visual_image_path': get_visual_image_path(),
     'thermal_image_path': get_thermal_image_path(),
     'temp_max_equipment_value': get_temp_max_equipment_value(),
-    'masked_image': get_masked_image_path(),
+    'masked_image_path': get_masked_image_path(),
 }
 
 

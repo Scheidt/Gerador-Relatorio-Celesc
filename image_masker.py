@@ -5,17 +5,18 @@ import ultralytics
 import torch
 
 PICKLE_PATH = "pickle_resultado_inferencia.pkl"
+THERMAL_IMG_PATH = "Img_Source/Img_Termica.jpg"
+VISUAL_IMG_PATH = "Img_Source/Img_Visual.jpg"
 
 def mask_image(SAVE_DIR: str):
-    file = open(PICKLE_PATH, 'rb')
-    response = pickle.load(file)
-    file.close()
+    with open(PICKLE_PATH, 'rb') as file:
+            response = pickle.load(file)
 
     # Acessar os resultados da YOLO e as imagens extras
     results = response["resultado"]  # lista de resultados
 
-    thermal_img = response["thermal"]
-    visual_img = response["visual"]
+    thermal_img = cv2.imread(THERMAL_IMG_PATH)
+    visual_img = cv2.imread(VISUAL_IMG_PATH)
 
     # Obtém a imagem com máscaras e bounding boxes desenhados
     image_with_masks = results[0].plot()
@@ -67,7 +68,7 @@ def mask_image(SAVE_DIR: str):
     final_image = np.vstack([top_row, bottom_row])
 
     # Salvar resultado
-    filename = f"{SAVE_DIR}resultado_final_{response['timestamp']}.jpg"
+    filename = f"{SAVE_DIR}resultado_final_mascarado.jpg"
     cv2.imwrite(filename, final_image)        
     print(f"Resultado salvo como '{filename}'.")
     return filename
