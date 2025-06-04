@@ -2,6 +2,7 @@ import pickle
 import cv2
 import numpy as np
 import ultralytics
+import torch
 
 PICKLE_PATH = "pickle_resultado_inferencia.pkl"
 
@@ -9,11 +10,10 @@ def mask_image(SAVE_DIR: str):
     file = open(PICKLE_PATH, 'rb')
     response = pickle.load(file)
     file.close()
-    results = response['results']
-    results.to('cpu')
 
     # Acessar os resultados da YOLO e as imagens extras
-    results = response["results"]  # lista de resultados
+    results = response["resultado"]  # lista de resultados
+
     thermal_img = response["thermal"]
     visual_img = response["visual"]
 
