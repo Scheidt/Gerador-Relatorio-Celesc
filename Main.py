@@ -1,8 +1,11 @@
 from report_Creator import *
 from datetime import datetime
+from image_masker import mask_image
+
+IMG_FOLDER = 'img_Source/'
 
 def get_logo_path():
-    return "Img_Source/logoCelesc.png"
+    return IMG_FOLDER + "logoCelesc.png"
 
 def get_report_code():
     return "PBO-02-19 B"
@@ -94,13 +97,19 @@ def get_description_long():
     )
 
 def get_visual_image_path():
-    return "Img_Source/Img_Visual.jpg"
+    return IMG_FOLDER + "Img_Visual.jpg"
 
 def get_thermal_image_path():
-    return "Img_Source/Img_Termica.jpg"
+    return IMG_FOLDER + "Img_Termica.jpg"
 
 def get_timestamp():
     return datetime.now()
+
+def get_temp_max_equipment_value():
+    return "Isolador" # Or fetch from actual source
+
+def get_masked_image_path():
+    return mask_image(IMG_FOLDER)
 
 # Populate the dictionary by calling the getter functions
 sample_data = {
@@ -134,7 +143,9 @@ sample_data = {
     'timestamp': get_timestamp(),
     'description_long': get_description_long(),
     'visual_image_path': get_visual_image_path(),
-    'thermal_image_path': get_thermal_image_path()
+    'thermal_image_path': get_thermal_image_path(),
+    'temp_max_equipment_value': get_temp_max_equipment_value(),
+    'masked_image_path': get_masked_image_path(),
 }
 
 
