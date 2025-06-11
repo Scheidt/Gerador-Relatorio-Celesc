@@ -1,6 +1,6 @@
 from report_Creator import *
 from datetime import datetime
-from image_masker import mask_image
+from part_isolation import mask_image
 
 IMG_FOLDER = 'img_Source/'
 

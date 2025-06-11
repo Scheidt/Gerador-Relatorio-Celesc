@@ -5,7 +5,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import mm
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.utils import ImageReader
-from part_masking import add_inspection_to_story
+from part_isolation import add_inspection_to_story
 
 def create_report_pdf(data, output_path):
     """
