@@ -111,6 +111,9 @@ def get_temp_max_equipment_value():
 def get_masked_image_path():
     return mask_image(IMG_FOLDER)
 
+def get_model_path():
+    return 'best_V11_aug.pt'
+
 # Populate the dictionary by calling the getter functions
 sample_data = {
     'logo_path': get_logo_path(),
@@ -146,6 +149,7 @@ sample_data = {
     'thermal_image_path': get_thermal_image_path(),
     'temp_max_equipment_value': get_temp_max_equipment_value(),
     'masked_image_path': get_masked_image_path(),
+    'model_path': get_model_path(),
 }
 
 

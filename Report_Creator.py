@@ -5,17 +5,44 @@ from reportlab.lib import colors
 from reportlab.lib.units import mm
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.utils import ImageReader
+from part_masking import add_inspection_to_story
 
 def create_report_pdf(data, output_path):
     """
-    data deve conter as seguintes chaves (strings, unless specified otherwise):
-      logo_path, report_code, timestamp (datetime object), reg_code, pbo_code,
-      feeder, equipment, form_number, inspector, agency_region, info_title,
-      dec_atual, contrib_dec, uc_conjunto, uc_possiveis, dec_date,
-      contrib_global, situacao_dec, location, visual_image_path,
-      thermal_image_path, delta_t, temp_ambient, temp_object, emissivity,
-      temp_max_equipment_value, description_long, department_info,
-      masked_image_path
+    'logo_path': get_logo_path(),
+    'report_code': get_report_code(),
+    'report_date': get_report_date(),
+    'reg_code': get_reg_code(),
+    'pbo_code': get_pbo_code(),
+    'classification': get_classification(),
+    'info_title': get_info_title(),
+    'inspector': get_inspector(),
+    'temp_ambient': get_temp_ambient(),
+    'temp_object': get_temp_object(),
+    'delta_t': get_delta_t(),
+    'operation': get_operation(),
+    'agency_region': get_agency_region(),
+    'feeder': get_feeder(),
+    'equipment': get_equipment(),
+    'form_number': get_form_number(),
+    'emissivity': get_emissivity(),
+    'department_info': get_department_info(),
+    'dec_atual': get_dec_atual(),
+    'contrib_dec': get_contrib_dec(),
+    'uc_conjunto': get_uc_conjunto(),
+    'uc_possiveis': get_uc_possiveis(),
+    'dec_date': get_dec_date(),
+    'contrib_global': get_contrib_global(),
+    'situacao_dec': get_situacao_dec(),
+    'location': get_location(),
+    'data_value': get_data_value(),
+    'timestamp': get_timestamp(),
+    'description_long': get_description_long(),
+    'visual_image_path': get_visual_image_path(),
+    'thermal_image_path': get_thermal_image_path(),
+    'temp_max_equipment_value': get_temp_max_equipment_value(),
+    'masked_image_path': get_masked_image_path(),
+    'model_path': get_model_path(),
     """
     doc = SimpleDocTemplate(
         output_path,
@@ -216,6 +243,9 @@ def create_report_pdf(data, output_path):
             error_message = f"Error loading, scaling, or adding masked image: {data.get('masked_image_path', 'Path not found')} - {type(e).__name__}: {e}"
             story.append(Paragraph(error_message, styles['Normal']))
             print(error_message)
+
+    story.append(PageBreak())
+    story = add_inspection_to_story(data['model_path'], data['visual_image_path'], data['thermal_image_path'], story)
 
     # Build the PDF
     doc.build(story)
