@@ -1,0 +1,3 @@
+Mudar o display de fts de partes
+Pegar imagem termica do pickle no part_masking
+Usar o contorno p/ fazer imagem nova, colocar fundo branco

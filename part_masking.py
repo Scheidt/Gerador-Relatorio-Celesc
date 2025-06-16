@@ -57,7 +57,7 @@ def predict_and_present(model, image_visual, image_thermal, plot=False):
     original_height_thermal, original_width_thermal, _ = original_copy_thermal.shape
 
     # Make predictions
-    results = model(image_visual)
+    results = model(image_visual) #TODO: PEGAR DO PICKLE
     neon_green = (0, 255, 0)  # Define neon green color (BGR format)
 
     # List to store predictions and zoomed images

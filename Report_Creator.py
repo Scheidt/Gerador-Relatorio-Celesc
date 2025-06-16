@@ -7,6 +7,8 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.utils import ImageReader
 from part_isolation import add_inspection_to_story
 
+
+# TODO: COLOCAR SUGESTÃO DE MANUTENÇÃO
 def create_report_pdf(data, output_path):
     """
     'logo_path': get_logo_path(),
@@ -175,7 +177,7 @@ def create_report_pdf(data, output_path):
     dept_info_style = ParagraphStyle(name='DeptInfoStyle', parent=styles['Normal'], alignment=TA_CENTER, fontSize=8, leading=10)
     story.append(Paragraph(data['department_info'], dept_info_style))
 
-
+    """
     # --- Masked Image on a New Page ---
     if 'masked_image_path' in data and data['masked_image_path']:
         story.append(PageBreak())
@@ -243,7 +245,7 @@ def create_report_pdf(data, output_path):
             error_message = f"Error loading, scaling, or adding masked image: {data.get('masked_image_path', 'Path not found')} - {type(e).__name__}: {e}"
             story.append(Paragraph(error_message, styles['Normal']))
             print(error_message)
-
+    """
     story.append(PageBreak())
     story = add_inspection_to_story(data['model_path'], data['visual_image_path'], data['thermal_image_path'], story)
 
