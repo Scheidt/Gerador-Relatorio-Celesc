@@ -3,8 +3,8 @@ import pickle
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import predict_and_present
-from utils import create_pdf_report
+from Legacy.utils import predict_and_present
+from Legacy.utils import create_pdf_report
 
 SERVER_HOST = "0.0.0.0"  # IP do servidor (pode ser 127.0.0.1 se o cliente e servidor estiverem na mesma máquina)
 SERVER_PORT = 6000  # Porta de comunicação
