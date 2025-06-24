@@ -202,7 +202,6 @@ def add_inspection_to_story(model_path, visual_img_path, thermal_img_path, story
     story.append(summary_table)
     story.append(PageBreak())
 
-    # Add detailed sections for each detected component
     for i, component in enumerate(zoomed_images):
         prediction = predictions_list[i]
         label = label_translation.get(prediction['label'], prediction['label'])
@@ -216,12 +215,16 @@ def add_inspection_to_story(model_path, visual_img_path, thermal_img_path, story
         cv2.imwrite(comp_thermal_path, component["thermal"])
         cv2.imwrite(comp_visual_path, component["visual"])
         
-        img_comp_thermal = Image(comp_thermal_path, width=3*inch, height=3*inch, kind='proportional')
-        img_comp_visual = Image(comp_visual_path, width=3*inch, height=3*inch, kind='proportional')
+        # Reduced image sizes for better fit when placed side-by-side with the table
+        img_comp_thermal = Image(comp_thermal_path, width=2.5*inch, height=2.5*inch, kind='proportional')
+        img_comp_visual = Image(comp_visual_path, width=2.5*inch, height=2.5*inch, kind='proportional')
         
-        comp_img_table = Table([[img_comp_visual, img_comp_thermal]], colWidths=[3.2*inch, 3.2*inch])
-        story.append(comp_img_table)
-        story.append(Spacer(1, 12))
+        # Create a table for the stacked images (one on top of the other)
+        stacked_images_table = Table([[img_comp_visual], [img_comp_thermal]])
+        stacked_images_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ]))
 
         # Add component details table
         component_data = [
@@ -244,7 +247,16 @@ def add_inspection_to_story(model_path, visual_img_path, thermal_img_path, story
             # Set background color based on temperature
             ('BACKGROUND', (1, 2), (1, 2), colors.orange if prediction['temp'] >= 60 else colors.lightgreen),
         ]))
-        story.append(comp_table)
+        
+        # Create the main table to hold the stacked images (left column) and the component details table (right column)
+        combined_layout_table = Table([[stacked_images_table, comp_table]], 
+                                    colWidths=[3*inch, 6.5*inch]) # Adjust column widths carefully
+        combined_layout_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'), # Align content to the top
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+        ]))
+        story.append(combined_layout_table)
+        story.append(Spacer(1, 12))
         
         # Add a page break if it's not the last component
         if i < len(zoomed_images) - 1:
