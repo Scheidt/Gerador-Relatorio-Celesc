@@ -1,3 +1,4 @@
-Mudar o display de fts de partes
+Mudar o display de fts de partes            FEITO
 Pegar imagem termica do pickle no part_masking
 Usar o contorno p/ fazer imagem nova, colocar fundo branco
+Arrumar cor da temperatuda da parte, com base nas instruções da Celesc      PARCIALMENTE FEITO

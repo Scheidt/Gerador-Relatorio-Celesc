@@ -220,11 +220,7 @@ def add_inspection_to_story(model_path, visual_img_path, thermal_img_path, story
         img_comp_visual = Image(comp_visual_path, width=2.5*inch, height=2.5*inch, kind='proportional')
         
         # Create a table for the stacked images (one on top of the other)
-        stacked_images_table = Table([[img_comp_visual], [img_comp_thermal]])
-        stacked_images_table.setStyle(TableStyle([
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ]))
+        stacked_images_table = [[img_comp_visual], [img_comp_thermal]]
 
         # Add component details table
         component_data = [
@@ -249,14 +245,23 @@ def add_inspection_to_story(model_path, visual_img_path, thermal_img_path, story
         ]))
         
         # Create the main table to hold the stacked images (left column) and the component details table (right column)
-        combined_layout_table = Table([[stacked_images_table, comp_table]], 
+        """combined_layout_table = Table([[stacked_images_table, comp_table]], 
                                     colWidths=[3*inch, 6.5*inch]) # Adjust column widths carefully
         combined_layout_table.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'TOP'), # Align content to the top
             ('ALIGN', (0,0), (-1,-1), 'LEFT'),
         ]))
         story.append(combined_layout_table)
-        story.append(Spacer(1, 12))
+        story.append(Spacer(1, 12))"""
+        dados_tabelados = [[stacked_images_table, comp_table]]
+        combined_table = Table(dados_tabelados)
+        estilo_combinado = TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'), # Align content to the top
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+        ])
+        combined_table.setStyle(estilo_combinado)
+        story.append(combined_table)
+
         
         # Add a page break if it's not the last component
         if i < len(zoomed_images) - 1:
