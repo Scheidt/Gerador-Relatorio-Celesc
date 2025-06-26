@@ -1,11 +1,17 @@
 # main.py
 import tempfile
+import pickle
+import os
 from datetime import datetime
-from reportlab.platypus import SimpleDocTemplate
+from reportlab.platypus import SimpleDocTemplate, PageBreak, Image, Paragraph, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from ultralytics import YOLO
 
 # --- Local Imports ---
 from report_generator import ReportGenerator
 from part_analysis import ComponentAnalyzer
+
 
 # --- Data Structures ---
 class GPS:
@@ -13,7 +19,7 @@ class GPS:
     def __init__(self, lat, lon): self.lat = lat; self.lon = lon
 
 # --- All Data Generation Functions ---
-IMG_FOLDER = 'img_Source/'
+IMG_FOLDER = 'Img_Source/'
 
 def get_logo_path(): return IMG_FOLDER + "logoCelesc.png"
 def get_report_code(): return "PBO-02-19 B"
@@ -62,7 +68,8 @@ def get_component_temperature_thresholds():
         "fuse-cutout": 65,
         "overhead-switch": 70,
         "transformer": 90,
-        "person": 40, # Example
+        "vertical-insulator": 40,
+        "horizontal-insulator": 40,
         # Default for any component not explicitly listed above
         "default": 60
     }
@@ -71,7 +78,7 @@ def run():
     """Main function to orchestrate the report generation process."""
     output_pdf_path = "Final_Inspection_Report.pdf"
     
-    # 1. Assemble the main data dictionary for the summary report
+    # 1. Assemble the main data dictionary for the report
     report_data = {
         'logo_path': get_logo_path(), 'report_code': get_report_code(),
         'reg_code': get_reg_code(), 'pbo_code': get_pbo_code(),
@@ -93,25 +100,64 @@ def run():
         'gps': get_gps(),
         'environmental_conditions': get_environmental_conditions(),
         'label_translation': get_label_translation(),
-        # Add the new threshold configuration to the main data dictionary
         'temp_thresholds': get_component_temperature_thresholds(),
     }
 
     try:
-        # 2. Generate the first part of the report (summary page)
-        print("Step 1: Generating summary page...")
-        report_generator = ReportGenerator(report_data)
-        story = report_generator.generate_summary_story()
-        print("Summary page story created.")
-
-        # Use a temporary directory for analysis images
+        # Use a temporary directory for all generated images and data files
         with tempfile.TemporaryDirectory() as temp_dir:
+            # --- PREDICTION STEP ---
+            # Run model inference once and store the results.
+            print("Step 0: Running model inference...")
+            model = YOLO(report_data['model_path'])
+            results = model(report_data['visual_image_path'])
+            
+            # Save results to a temporary pickle file for quad_masking
+            pickle_path = os.path.join(temp_dir, "inference_results.pkl")
+            with open(pickle_path, 'wb') as f:
+                pickle.dump({"resultado": results}, f)
+            print(f"Inference results saved to temporary file: {pickle_path}")
+
+
+            # --- REPORT GENERATION ---
+            # 1. Generate the first part of the report (summary page)
+            print("\nStep 1: Generating summary page...")
+            report_generator = ReportGenerator(report_data)
+            story = report_generator.generate_summary_story()
+            print("Summary page story created.")
+
+            # 2. OPTIONAL: Generate and add the quad-masked image to the report
+            # Change this to 'if False:' to disable this section
+            """if QUAD_MASKING_ENABLED:
+                print("\nStep 2: Generating quad-masked image page...")
+                quad_image_path = quad_masked_image(
+                    pickle_path=pickle_path,
+                    thermal_img_path=report_data['thermal_image_path'],
+                    visual_img_path=report_data['visual_image_path'],
+                    save_dir=temp_dir
+                )
+                
+                story.append(PageBreak())
+                # Add a title for the page
+                styles = getSampleStyleSheet()
+                story.append(Paragraph("Visão Geral da Detecção", styles['h1']))
+                story.append(Spacer(1, 12))
+                
+                # A4 dimensions: (595.27, 841.89)
+                page_width, page_height = A4
+                img_width = page_width * 0.9 # Use 90% of page width
+                
+                quad_img = Image(quad_image_path, width=img_width, height=img_width, kind='proportional')
+                story.append(quad_img)
+                print("Quad-masked image page added to story.")"""
+
+
             # 3. Generate and add the second part (detailed analysis)
-            print("\nStep 2: Generating detailed component analysis...")
+            print("\nStep 3: Generating detailed component analysis...")
             analyzer = ComponentAnalyzer(report_data)
             analyzer.add_analysis_to_story(
                 story,
-                model_path=report_data['model_path'],
+                results=results, # Pass the pre-computed results
                 visual_img_path=report_data['visual_image_path'],
                 thermal_img_path=report_data['thermal_image_path'],
                 temp_dir=temp_dir
@@ -119,8 +165,8 @@ def run():
             print("Detailed analysis added to story.")
 
             # 4. Build the final PDF from the combined story
-            print("\nStep 3: Building final PDF...")
-            doc = SimpleDocTemplate(output_pdf_path)
+            print("\nStep 4: Building final PDF...")
+            doc = SimpleDocTemplate(output_pdf_path, pagesize=A4)
             doc.build(story)
             print(f"Successfully created report: {output_pdf_path}")
 

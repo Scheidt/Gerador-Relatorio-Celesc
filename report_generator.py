@@ -18,33 +18,33 @@ class ReportGenerator:
         story = []
         # Build all elements for the first page
         story.extend(self._create_header())
-        story.append(Spacer(1, 5 * mm))
-        
+        story.append(Spacer(1, 2 * mm)) # This spacer is already small, kept as is.
+
         agency_style = ParagraphStyle(name='AgencyStyle', parent=self.styles['Normal'], alignment=TA_CENTER, fontName='Helvetica-Bold', fontSize=10)
         story.append(Paragraph(self.data['agency_region'], agency_style))
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 3 * mm)) # REDUCED from 5*mm
 
         info_title_style = ParagraphStyle(name='InfoContStyle', parent=self.styles['Normal'], fontName='Helvetica-Bold', fontSize=11, spaceBefore=6, spaceAfter=6)
         story.append(Paragraph(self.data['info_title'], info_title_style))
         story.append(self._create_dec_table())
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 3 * mm)) # REDUCED from 5*mm
 
         location_style = ParagraphStyle(name='LocationStyle', parent=self.styles['Normal'], fontSize=9, leading=12)
         story.append(Paragraph(f"<b>Localização:</b> {self.data['location']}", location_style))
-        story.append(Spacer(1, 3 * mm))
-        
+        story.append(Spacer(1, 3 * mm)) # Kept as is.
+
         story.append(self._create_main_images_table())
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 3 * mm)) # REDUCED from 5*mm
 
         story.append(self._create_temperature_table())
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 3 * mm)) # REDUCED from 5*mm
 
         obs_title_style = ParagraphStyle(name='ObsTitleStyle', parent=self.styles['Normal'], fontName='Helvetica-Bold', fontSize=10)
         story.append(Paragraph("<b>OBSERVAÇÕES:</b>", obs_title_style))
-        story.append(Spacer(1, 2 * mm))
+        story.append(Spacer(1, 2 * mm)) # Kept as is.
         desc_style = ParagraphStyle(name='DescriptionStyle', parent=self.styles['Normal'], fontSize=9, leading=12)
         story.append(Paragraph(self.data['description_long'], desc_style))
-        story.append(Spacer(1, 8 * mm))
+        story.append(Spacer(1, 4 * mm)) # SIGNIFICANTLY REDUCED from 8*mm
 
         dept_info_style = ParagraphStyle(name='DeptInfoStyle', parent=self.styles['Normal'], alignment=TA_CENTER, fontSize=8, leading=10)
         story.append(Paragraph(self.data['department_info'], dept_info_style))
