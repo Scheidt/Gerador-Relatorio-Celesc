@@ -1,4 +1,3 @@
-# main.py
 import tempfile
 import pickle
 import os
@@ -7,6 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, PageBreak, Image, Paragraph, S
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from ultralytics import YOLO
+from inference_engine import *
 
 # --- Local Imports ---
 from report_generator import ReportGenerator
@@ -75,10 +75,13 @@ def get_component_temperature_thresholds():
     }
 
 def run():
-    """Main function to orchestrate the report generation process."""
+    """
+    Função principal (Controlador) que orquestra a coleta de dados,
+    a execução da inferência e a geração do relatório.
+    """
     output_pdf_path = "Final_Inspection_Report.pdf"
     
-    # 1. Assemble the main data dictionary for the report
+    # 1. Montar o dicionário de dados principal a partir das fontes de dados
     report_data = {
         'logo_path': get_logo_path(), 'report_code': get_report_code(),
         'reg_code': get_reg_code(), 'pbo_code': get_pbo_code(),
@@ -104,74 +107,51 @@ def run():
     }
 
     try:
-        # Use a temporary directory for all generated images and data files
         with tempfile.TemporaryDirectory() as temp_dir:
-            # --- PREDICTION STEP ---
-            # Run model inference once and store the results.
-            print("Step 0: Running model inference...")
-            model = YOLO(report_data['model_path'])
-            results = model(report_data['visual_image_path'])
+            # --- ETAPA DE INFERÊNCIA (delegada ao InferenceEngine) ---
+            print("Step 1: Inicializando o motor de inferência...")
+            engine = InferenceEngine(model_path=report_data['model_path'])
             
-            # Save results to a temporary pickle file for quad_masking
+            # Executa a inferência para obter os resultados
+            results = engine.run_inference(image_path=report_data['visual_image_path'])
+            
+            # Gera a imagem anotada usando o motor
+            annotated_image_path = engine.generate_annotated_image(results, temp_dir)
+            
+            # (Opcional) Salvar resultados para depuração, como antes
             pickle_path = os.path.join(temp_dir, "inference_results.pkl")
             with open(pickle_path, 'wb') as f:
                 pickle.dump({"resultado": results}, f)
-            print(f"Inference results saved to temporary file: {pickle_path}")
+            print(f"Resultados da inferência salvos em: {pickle_path}")
 
-
-            # --- REPORT GENERATION ---
-            # 1. Generate the first part of the report (summary page)
-            print("\nStep 1: Generating summary page...")
+            # --- ETAPA DE GERAÇÃO DO RELATÓRIO ---
+            # 2. Gerar a primeira parte do relatório (página de resumo)
+            print("\nStep 2: Gerando a página de resumo...")
             report_generator = ReportGenerator(report_data)
             story = report_generator.generate_summary_story()
-            print("Summary page story created.")
+            print("Página de resumo criada.")
 
-            # 2. OPTIONAL: Generate and add the quad-masked image to the report
-            # Change this to 'if False:' to disable this section
-            """if QUAD_MASKING_ENABLED:
-                print("\nStep 2: Generating quad-masked image page...")
-                quad_image_path = quad_masked_image(
-                    pickle_path=pickle_path,
-                    thermal_img_path=report_data['thermal_image_path'],
-                    visual_img_path=report_data['visual_image_path'],
-                    save_dir=temp_dir
-                )
-                
-                story.append(PageBreak())
-                # Add a title for the page
-                styles = getSampleStyleSheet()
-                story.append(Paragraph("Visão Geral da Detecção", styles['h1']))
-                story.append(Spacer(1, 12))
-                
-                # A4 dimensions: (595.27, 841.89)
-                page_width, page_height = A4
-                img_width = page_width * 0.9 # Use 90% of page width
-                
-                quad_img = Image(quad_image_path, width=img_width, height=img_width, kind='proportional')
-                story.append(quad_img)
-                print("Quad-masked image page added to story.")"""
-
-
-            # 3. Generate and add the second part (detailed analysis)
-            print("\nStep 3: Generating detailed component analysis...")
+            # 3. Gerar e adicionar a segunda parte (análise detalhada)
+            print("\nStep 3: Gerando a análise detalhada dos componentes...")
             analyzer = ComponentAnalyzer(report_data)
             analyzer.add_analysis_to_story(
                 story,
-                results=results, # Pass the pre-computed results
+                results=results,
                 visual_img_path=report_data['visual_image_path'],
                 thermal_img_path=report_data['thermal_image_path'],
+                annotated_visual_image_path=annotated_image_path,
                 temp_dir=temp_dir
             )
-            print("Detailed analysis added to story.")
+            print("Análise detalhada adicionada ao relatório.")
 
-            # 4. Build the final PDF from the combined story
-            print("\nStep 4: Building final PDF...")
+            # 4. Construir o PDF final a partir do 'story' combinado
+            print("\nStep 4: Construindo o PDF final...")
             doc = SimpleDocTemplate(output_pdf_path, pagesize=A4)
             doc.build(story)
-            print(f"Successfully created report: {output_pdf_path}")
+            print(f"Relatório criado com sucesso: {output_pdf_path}")
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"Ocorreu um erro inesperado: {e}")
         import traceback
         traceback.print_exc()
 

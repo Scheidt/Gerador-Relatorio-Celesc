@@ -9,7 +9,6 @@ from reportlab.platypus import Paragraph, Table, TableStyle, Image, Spacer, Page
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from Legacy.quad_masking import quad_masked_image
 
 class ComponentAnalyzer:
     """
@@ -79,12 +78,12 @@ class ComponentAnalyzer:
                 predictions_list.append({
                     "id": i + 1,
                     "label": label,
-                    "temp": random.randint(40, 95)
+                    "temp": random.randint(30, 70)
                 })
         
         return zoomed_images, predictions_list, gps_lat, gps_lon, env_temp, hr, emissivity
 
-    def add_analysis_to_story(self, story, results, visual_img_path, thermal_img_path, temp_dir):
+    def add_analysis_to_story(self, story, results, visual_img_path, thermal_img_path, annotated_visual_image_path, temp_dir):
         """
         Adds the full component analysis section to the provided story list.
         """
@@ -106,7 +105,33 @@ class ComponentAnalyzer:
             story.append(Spacer(1, 12))
             story.append(Paragraph("No components were detected in the image.", self.styles['Normal']))
             return
-        
+
+        story.append(PageBreak())
+        story.append(Paragraph("Resumo Térmico por Componente", self.styles['h1']))
+        story.append(Spacer(1, 20))
+        summary_table_data = [["Nome do Componente", "Temperatura", "Diagnóstico"]]
+        table_style_commands = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkslategray), ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]
+        for i, pred in enumerate(predictions):
+            row_index = i + 1
+            display_label = self.label_translation.get(pred['label'], pred['label'])
+            temp = pred['temp']
+            raw_label = pred['label']
+            danger_threshold = self.temp_thresholds.get(raw_label, self.temp_thresholds.get('default', 60))
+            if temp >= danger_threshold:
+                diagnosis, bg_color = "Atenção Requerida", colors.orange
+            else:
+                diagnosis, bg_color = "Normal", colors.lightgreen
+            summary_table_data.append([display_label, f"{temp}°C", diagnosis])
+            table_style_commands.append(('BACKGROUND', (0, row_index), (-1, row_index), bg_color))
+        thermal_summary_table = Table(summary_table_data, colWidths=[3*inch, 2*inch, 2*inch])
+        thermal_summary_table.setStyle(TableStyle(table_style_commands))
+        story.append(thermal_summary_table)
+
+        # Início da análise detalhada individual
         story.append(PageBreak())
         story.append(Paragraph(f"Relatório de Inspeção Detalhada", self.styles['Title']))
         story.append(Spacer(1, 24))
@@ -122,50 +147,9 @@ class ComponentAnalyzer:
         ]
         summary_table = Table(summary_data, colWidths=[2.5*inch, 4*inch], style=[('SPAN', (0, 0), (1, 0)), ('BACKGROUND', (0, 0), (1, 0), colors.darkslategray), ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke), ('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'), ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'), ('GRID', (0, 0), (-1, -1), 1, colors.black)])
         story.append(summary_table)
-        story.append(PageBreak())
-
-
-        # Início da análise detalhada individual
-        # --- INÍCIO DA SEÇÃO NOVA: Tabela de Resumo Térmico ---
-        story.append(Paragraph("Resumo Térmico por Componente", self.styles['h1']))
-        story.append(Spacer(1, 20))
-
-        # Prepara os dados e os estilos da tabela
-        summary_table_data = [["Nome do Componente", "Temperatura", "Diagnóstico"]]
-        table_style_commands = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.darkslategray),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]
-
-        for i, pred in enumerate(predictions):
-            row_index = i + 1
-            display_label = self.label_translation.get(pred['label'], pred['label'])
-            temp = pred['temp']
-            raw_label = pred['label']
-            danger_threshold = self.temp_thresholds.get(raw_label, self.temp_thresholds.get('default', 60))
-
-            if temp >= danger_threshold:
-                diagnosis = "Atenção Requerida"
-                bg_color = colors.orange
-            else:
-                diagnosis = "Normal"
-                bg_color = colors.lightgreen
-
-            summary_table_data.append([display_label, f"{temp}°C", diagnosis])
-            # Adiciona o comando de cor de fundo para a linha atual
-            table_style_commands.append(('BACKGROUND', (0, row_index), (-1, row_index), bg_color))
-
-        # Cria e adiciona a tabela ao relatório
-        thermal_summary_table = Table(summary_table_data, colWidths=[3*inch, 2*inch, 2*inch])
-        thermal_summary_table.setStyle(TableStyle(table_style_commands))
-        story.append(thermal_summary_table)
-        # --- FIM DA SEÇÃO NOVA ---
-
+        
         for i, component_assets in enumerate(zoomed_images):
+            story.append(PageBreak())
             prediction = predictions[i]
             display_label = self.label_translation.get(prediction['label'], prediction['label'])
             
@@ -177,20 +161,24 @@ class ComponentAnalyzer:
             cv2.imwrite(comp_visual_path, component_assets["visual"])
             cv2.imwrite(comp_thermal_path, component_assets["thermal"])
             
-            img_comp_visual = Image(comp_visual_path, width=2.5*inch, height=2.5*inch, kind='proportional')
-            img_comp_thermal = Image(comp_thermal_path, width=2.5*inch, height=2.5*inch, kind='proportional')
-            stacked_images = Table([[img_comp_visual], [img_comp_thermal]])
+            img_comp_visual = Image(comp_visual_path, width=1*inch, height=1*inch, kind='proportional')
+            img_comp_thermal = Image(comp_thermal_path, width=1*inch, height=1*inch, kind='proportional')
+            img_annotated_full = Image(annotated_visual_image_path, width=2.5*inch, height=2.5*inch, kind='proportional')
+            
+            stacked_images = Table([
+                [Paragraph("<i>Zoom Visual</i>", self.styles['Normal'])], [img_comp_visual], 
+                [Paragraph("<i>Zoom Térmico</i>", self.styles['Normal'])], [img_comp_thermal],
+                [Paragraph("<i>Visão Geral Anotada</i>", self.styles['Normal'])], [img_annotated_full]
+            ], style=[('ALIGN', (0,0), (-1,-1), 'CENTER')])
 
             temp = prediction['temp']
             raw_label = prediction['label']
             danger_threshold = self.temp_thresholds.get(raw_label, self.temp_thresholds.get('default', 60))
 
             if temp >= danger_threshold:
-                diagnosis = "Atenção Requerida"
-                bg_color = colors.orange
+                diagnosis, bg_color = "Atenção Requerida", colors.orange
             else:
-                diagnosis = "Normal"
-                bg_color = colors.lightgreen
+                diagnosis, bg_color = "Normal", colors.lightgreen
 
             comp_data = [
                 ["Análise do Componente", ""],
@@ -201,10 +189,7 @@ class ComponentAnalyzer:
             
             comp_table = Table(comp_data, colWidths=[2*inch, 2.2*inch], style=[('SPAN', (0, 0), (1, 0)), ('BACKGROUND', (0, 0), (1, 0), colors.darkslategray), ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke), ('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'), ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'), ('GRID', (0, 0), (-1, -1), 1, colors.black), ('BACKGROUND', (1, 3), (1, 3), bg_color)])
 
-            combined_layout_table = Table([[stacked_images, comp_table]], colWidths=[2.7*inch, 4.2*inch], style=[('VALIGN', (0,0), (-1,-1), 'TOP')])
+            combined_layout_table = Table([[stacked_images, comp_table]], colWidths=[2.8*inch, 4.2*inch], style=[('VALIGN', (0,0), (-1,-1), 'TOP')])
             story.append(combined_layout_table)
-
-            if i < len(zoomed_images) - 1:
-                story.append(PageBreak())
         
         print("Finished adding component analysis to story.")
