@@ -2,7 +2,11 @@ Mudar o display de fts de partes            FEITO
 Pegar imagem termica do pickle no part_masking
 Usar o contorno p/ fazer imagem nova, colocar fundo branco      FEITO
 Arrumar cor da temperatuda da parte, com base nas instruções da Celesc      PARCIALMENTE FEITO
-Colocar imagem visual com mascara no display de todos os componentes
-Tirar da pg 2 aquela tabela (ela é redundante)
+
+
+
+Colocar imagem visual com mascara no display de todos os componentes        
+Tirar da pg 2 aquela tabela (ela é redundante)          FEITO
 Colocar na pg 2 um resumo termico de todos os componentes
 Reduzir resolução dos componentes com mascara
+Arrumar Get Térmico de part_analysis
