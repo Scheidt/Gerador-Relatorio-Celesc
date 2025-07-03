@@ -10,3 +10,5 @@ Tirar da pg 2 aquela tabela (ela é redundante)          FEITO
 Colocar na pg 2 um resumo termico de todos os componentes       FEITO
 Reduzir resolução dos componentes com mascara       FEITO
 Pegar a temperatura da inferência        
+Thresholds de temperatura baseados no delta t
+Parar de fazer inferencia e só pegar resultado pronto no pkl
