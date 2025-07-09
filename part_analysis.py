@@ -65,7 +65,7 @@ class ComponentAnalyzer:
                 })
 
                 label = model_names[int(box.cls)]
-                temp_max = random.randint(env_temp + 5, env_temp + 130)
+                temp_max = random.randint(env_temp + 5, env_temp + 30)
                 temp_min = temp_max - random.randint(10, 25)
                 if temp_min < env_temp: temp_min = env_temp
 

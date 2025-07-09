@@ -1,37 +1,39 @@
 import os
 import cv2
+import pickle
 from ultralytics import YOLO
 
 class InferenceEngine:
     """
-    Encapsula a lógica de carregamento e execução do modelo YOLO.
+    Encapsula a lógica de carregamento de resultados de inferência e a geração de imagens.
     Atua como o "Model" na arquitetura, cuidando da lógica de negócio da IA.
     """
-    def __init__(self, model_path: str):
+    def __init__(self):
         """
-        Inicializa o motor de inferência carregando o modelo YOLO.
-        O modelo é carregado apenas uma vez para maior eficiência.
+        Inicializa o motor de inferência. O modelo não é mais carregado aqui.
+        """
+        print("Motor de inferência inicializado. Pronto para carregar resultados.")
+
+    def load_inference_from_pickle(self, pickle_path: str):
+        """
+        Carrega os resultados da inferência de um arquivo .pkl.
 
         Args:
-            model_path (str): Caminho para o arquivo do modelo treinado (.pt).
-        """
-        print(f"Carregando modelo de: {model_path}")
-        self.model = YOLO(model_path)
-        print("Modelo carregado com sucesso.")
-
-    def run_inference(self, image_path: str):
-        """
-        Executa a inferência do modelo na imagem fornecida.
-
-        Args:
-            image_path (str): Caminho para a imagem visual a ser analisada.
+            pickle_path (str): Caminho para o arquivo .pkl com os resultados.
 
         Returns:
             list: A lista de resultados da inferência do Ultralytics.
         """
-        print(f"Executando inferência em: {image_path}")
-        results = self.model(image_path)
-        print("Inferência concluída.")
+        print(f"Carregando resultados da inferência de: {pickle_path}")
+        if not os.path.exists(pickle_path):
+            raise FileNotFoundError(f"Arquivo pickle não encontrado: {pickle_path}")
+        
+        with open(pickle_path, 'rb') as f:
+            data = pickle.load(f)
+            # O resultado está sob a chave 'resultado' conforme a estrutura fornecida
+            results = data['resultado']
+        
+        print("Resultados da inferência carregados com sucesso.")
         return results
 
     def generate_annotated_image(self, results, save_dir: str, filename="annotated_visual.png") -> str:

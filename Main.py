@@ -18,7 +18,7 @@ from get_utils import *
 def run():
     """
     Função principal (Controlador) que orquestra a coleta de dados,
-    a execução da inferência e a geração do relatório.
+    o carregamento dos resultados da inferência e a geração do relatório.
     """
     output_pdf_path = "Final_Inspection_Report.pdf"
     
@@ -40,7 +40,7 @@ def run():
         'temp_max_equipment_value': get_temp_max_equipment_value(),
         'visual_image_path': get_visual_image_path(),
         'thermal_image_path': get_thermal_image_path(),
-        'model_path': get_model_path(),
+        'pickle_path': get_pickle_path(),
         'gps': get_gps(),
         'environmental_conditions': get_environmental_conditions(),
         'label_translation': get_label_translation(),
@@ -49,21 +49,15 @@ def run():
 
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-            # --- ETAPA DE INFERÊNCIA (delegada ao InferenceEngine) ---
-            print("Step 1: Inicializando o motor de inferência...")
-            engine = InferenceEngine(model_path=report_data['model_path'])
+            # --- ETAPA DE CARREGAMENTO DOS RESULTADOS (modificado) ---
+            print("Step 1: Inicializando o motor e carregando resultados...")
+            engine = InferenceEngine()
             
-            # Executa a inferência para obter os resultados
-            results = engine.run_inference(image_path=report_data['visual_image_path'])
+            # Carrega os resultados do arquivo pickle em vez de executar a inferência
+            results = engine.load_inference_from_pickle(pickle_path=report_data['pickle_path'])
             
             # Gera a imagem anotada usando o motor
             annotated_image_path = engine.generate_annotated_image(results, temp_dir)
-            
-            # (Opcional) Salvar resultados para depuração, como antes
-            pickle_path = os.path.join(temp_dir, "inference_results.pkl")
-            with open(pickle_path, 'wb') as f:
-                pickle.dump({"resultado": results}, f)
-            print(f"Resultados da inferência salvos em: {pickle_path}")
 
             # --- ETAPA DE GERAÇÃO DO RELATÓRIO ---
             # 2. Gerar a primeira parte do relatório (página de resumo)

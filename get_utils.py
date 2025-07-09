@@ -38,7 +38,7 @@ def get_visual_image_path(): return IMG_FOLDER + "Img_Visual.jpg"
 def get_thermal_image_path(): return IMG_FOLDER + "Img_Termica.jpg"
 def get_timestamp(): return datetime.now()
 def get_temp_max_equipment_value(): return "Isolador"
-def get_model_path(): return 'best_V11_aug.pt'
+def get_pickle_path(): return 'pickle_resultado_inferencia.pkl'
 def get_gps(): return GPS(-27.59, -48.54) # Florianópolis
 def get_environmental_conditions(): return {'hr': 0.65, 'env_temp': 25}
 def get_label_translation():
