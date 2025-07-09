@@ -44,7 +44,7 @@ def run():
         'gps': get_gps(),
         'environmental_conditions': get_environmental_conditions(),
         'label_translation': get_label_translation(),
-        'temp_thresholds': get_component_temperature_thresholds(),
+        'diagnosis_function': get_diagnosis_by_component,
     }
 
     try:
@@ -71,6 +71,7 @@ def run():
             report_generator = ReportGenerator(report_data)
             story = report_generator.generate_summary_story()
             print("Página de resumo criada.")
+            story.append(PageBreak())
 
             # 3. Gerar e adicionar a segunda parte (análise detalhada)
             print("\nStep 3: Gerando a análise detalhada dos componentes...")

@@ -1,4 +1,6 @@
+# get_utils.py
 from datetime import datetime
+from reportlab.lib import colors
 
 # --- Data Structures ---
 class GPS:
@@ -43,20 +45,32 @@ def get_label_translation():
     return {
         "transformer" : "Transformador", "vertical-insulator" : "Isolador vertical",
         "horizontal-insulator" : "Isolador horizontal", "fuse-cutout" : "Chave fusivel",
-        "overhead-switch" : "Chave faca", "connector" : "Conector", 'person': 'Pessoa' # YOLO model default
+        "overhead-switch" : "Chave faca", "connector" : "Conector", 'person': 'Pessoa'
     }
 
-
-def get_component_temperature_thresholds():
-    """Returns a dict of danger temperature thresholds per component type."""
-    return {
-        # Raw label from model : Danger Temperature in Celsius
-        "connector": 75 + get_temp_ambient(),
-        "fuse-cutout": 65 + get_temp_ambient(),
-        "overhead-switch": 70 + get_temp_ambient(),
-        "transformer": 90 + get_temp_ambient(),
-        "vertical-insulator": 40 + get_temp_ambient(),
-        "horizontal-insulator": 40 + get_temp_ambient(),
-
-        "default": 60 + get_temp_ambient()
+def get_diagnosis_by_component(component_label, delta_t):
+    """
+    Determina o diagnóstico e a cor com base no tipo de componente e no delta_t.
+    Retorna uma tupla (texto_do_diagnostico, cor_reportlab).
+    """
+    # Thresholds de Delta T em Celsius para cada diagnóstico: (Programada, Imediata, Urgente)
+    thresholds = {
+        "connector":              (20, 40, 60),
+        "fuse-cutout":            (15, 30, 50),
+        "overhead-switch":        (15, 35, 55),
+        "transformer":            (25, 50, 75),
+        "vertical-insulator":     (10, 20, 40),
+        "horizontal-insulator":   (10, 20, 40),
+        "default":                (10, 30, 60)
     }
+    
+    prog_thresh, imed_thresh, urg_thresh = thresholds.get(component_label, thresholds["default"])
+
+    if delta_t >= urg_thresh:
+        return "Manutenção Urgente", colors.Color(0.8, 0, 0)
+    elif delta_t >= imed_thresh:
+        return "Manutenção Imediata", colors.red
+    elif delta_t >= prog_thresh:
+        return "Manutenção Programada", colors.orange
+    else:
+        return "Sem Manutenção", colors.lightgreen

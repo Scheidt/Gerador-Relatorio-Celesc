@@ -9,6 +9,6 @@ Colocar imagem visual com mascara no display de todos os componentes  FEITO
 Tirar da pg 2 aquela tabela (ela é redundante)          FEITO
 Colocar na pg 2 um resumo termico de todos os componentes       FEITO
 Reduzir resolução dos componentes com mascara       FEITO
-Pegar a temperatura da inferência        
-Thresholds de temperatura baseados no delta t
+Pegar a temperatura da inferência        Impossível por hora
+Thresholds de temperatura baseados no delta t           FEITO
 Parar de fazer inferencia e só pegar resultado pronto no pkl
