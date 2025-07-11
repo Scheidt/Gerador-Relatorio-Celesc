@@ -53,7 +53,7 @@ def mask_image(SAVE_DIR: str):
             mask_uint8 = (resized_mask * 255).astype(np.uint8)
 
             # Encontrar contornos
-            contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) # TODO: Usar o contorno p/ fazer imagem nova, colocar fundo branco
 
             # Desenhar os contornos em vermelho sobre a imagem térmica
             cv2.drawContours(thermal_with_contours, contours, -1, (50, 255, 50), 2)
