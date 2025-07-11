@@ -99,7 +99,7 @@ class ComponentAnalyzer:
             
             # --- Preparação dos Elementos da Tabela ---
             # MODIFICAÇÃO: Tamanho da imagem reduzido para compactar a tabela
-            img_size = 1.2 * inch
+            img_size = 0.6 * inch
             comp_visual_path = os.path.join(temp_dir, f"comp_{i+1}_visual.png")
             comp_thermal_path = os.path.join(temp_dir, f"comp_{i+1}_thermal.png")
             cv2.imwrite(comp_visual_path, component_assets["visual"])
